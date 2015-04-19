@@ -1,10 +1,6 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
-```{r}
+# Reproducible Research: Peer Assessment 1
+
+```r
 ## Loading and preprocessing the data
 rawdata <- read.csv("./activity/activity.csv")
 
@@ -16,8 +12,25 @@ data <- rawdata[complete.cases(rawdata),]
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(chron)
 
 #1. Total steps per day
@@ -26,17 +39,21 @@ steps.per.day <- summarize(group_by(data,date),sum(steps))
 #2. Histogram of steps per day
 hist(steps.per.day$"sum(steps)",col="red",xlab="Total Steps per Day",
      main="Frequency of Total Steps per Day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 #3. Mean and median of total steps per day
 mean.steps.per.day <- summarize(steps.per.day,mean(steps.per.day$"sum(steps)"))
 median.steps.per.day <- summarize(steps.per.day,median(steps.per.day$"sum(steps)"))
 ```
-The mean total number of steps taken per day is `r mean.steps.per.day` 
-and the median is `r median.steps.per.day`.  
+The mean total number of steps taken per day is 1.0766189\times 10^{4} 
+and the median is 10765.  
 
 ## What is the average daily activity pattern?
-```{r}
 
+```r
 #1. Plot average steps taken per interval(x) vs. all days (y)
 avg.steps.per.interval <- summarize(group_by(data,interval),mean(steps))
 avg.steps.per.interval$interval <- formatC(avg.steps.per.interval$interval, 
@@ -44,19 +61,21 @@ avg.steps.per.interval$interval <- formatC(avg.steps.per.interval$interval,
 avg.steps.per.interval$interval <- strptime(avg.steps.per.interval$interval,format="%H%M")
 plot(avg.steps.per.interval$interval,avg.steps.per.interval$"mean(steps)",type="l",
      xlab="24 Hr. Time",ylab="Average Steps",main="Average Steps per Interval")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
+```r
 #2. Maximum average 5-minute interval
 max.avg.interval <- avg.steps.per.interval[which.max(avg.steps.per.interval$"mean(steps)"),]
-
-
 ```
 
 
 
 
 ## Imputing missing values
-```{r}
+
+```r
 #1. Calculate and report the total number of missing values in the dataset
 missing.values <- rawdata[!complete.cases(rawdata),]
 number.missing.values <- length(missing.values$steps)
@@ -87,8 +106,11 @@ imputed.steps.per.day <- summarize(group_by(imputeddata,date),sum(steps))
 
 hist(imputed.steps.per.day$"sum(steps)",col="red",xlab="Total Steps per Day",
      main="Frequency of Total Steps per Day (Imputed Data)")
-  
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
+```r
 # Impact of imputing missing on mean and median.
 mean.imputed.steps.per.day <- summarize(imputed.steps.per.day,mean(imputed.steps.per.day$"sum(steps)"))
 median.imputed.steps.per.day <- summarize(imputed.steps.per.day,median(imputed.steps.per.day$"sum(steps)"))
@@ -101,8 +123,8 @@ median.imputed.steps.per.day <- summarize(imputed.steps.per.day,median(imputed.s
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
 
+```r
 weekdays.data <- data
 weekdays <- weekdays(as.Date(weekdays.data$date))
 weekdays <- factor(weekdays)
@@ -120,7 +142,11 @@ weekdays.avg.steps.per.interval <- summarize(group_by(weekdays.data,daytype,inte
 library(ggplot2)
 ggplot(weekdays.avg.steps.per.interval,aes(interval,weekdays.avg.steps.per.interval$"mean(steps)")) + geom_line(aes(color=daytype)) +
   facet_grid(daytype~.) + xlab("Interval") + ylab("Steps")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
+```r
 # Yes, there is a difference in the patterns of steps between weekdays and weekends. On weekdays, there are more
 # steps taken early in the day, presumably as the subject is going to work, then fewer steps throughout the day.
 # On weekends, there are more steps taken in the core of the day and extending slightly longer into
